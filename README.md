@@ -31,12 +31,12 @@ Show closed Ports in result
 
 ```powershell
 Port Status
- ---- ------
-   21 Open  
-   80 Open  
-  139 Open  
-  443 Open
-  445 Open  
+---- ------
+  21 Open  
+  80 Open  
+ 139 Open  
+ 443 Open
+ 445 Open  
 ```
   
   ## ToDo
