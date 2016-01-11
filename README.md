@@ -29,6 +29,7 @@ Show closed Ports in result
 
 ## Output 
 
+```powershell
 Port Status
  ---- ------
    21 Open  
@@ -36,7 +37,8 @@ Port Status
   139 Open  
   443 Open
   445 Open  
-
+```
+  
   ## ToDo
   - Integrate Port-List
     like: 80 (http), 443 (https) ...
