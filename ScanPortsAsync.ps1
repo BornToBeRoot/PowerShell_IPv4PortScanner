@@ -1,6 +1,6 @@
 ###############################################################################################################
 # Language     :  PowerShell 4.0
-# Script Name  :  ScanNetworkAsync.ps1
+# Script Name  :  ScanPortsAsync.ps1
 # Autor        :  BornToBeRoot (https://github.com/BornToBeRoot)
 # Description  :  Asynchronus Port Scanner
 # Repository   :  https://github.com/BornToBeRoot/PowerShell-Async-PortScanner
