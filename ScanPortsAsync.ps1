@@ -17,16 +17,12 @@
     
     This script also work fine along with my asychronus IP-Scanner published on GitHub too. You can easily
     pipe the output of the IP-Scanner result in this script.
-
     If you found a bug or have some ideas to improve this script... Let me know. You find my Github profile in
     the links below.
-
     .EXAMPLE
     .\ScanPortsAsync.ps1 -IPv4Address 172.16.0.1 -StartPort 1 -EndPort 1000
-
     .EXAMPLE
     .\ScanPortsAsync.ps1 -IPv4Address 192.168.1.100 -IncludeClosed
-
     .LINK
     Github Profil:         https://github.com/BornToBeRoot
     Github Repository:     https://github.com/BornToBeRoot/PowerShell-Async-PortScanner
@@ -75,14 +71,6 @@ Begin{
     # Validate Port-Range
     if($StartPort -gt $EndPort)
     {
-<<<<<<< HEAD
-        Write-Host "Check your input! Invalid Port-Range (-StartPort can't be lower than -EndPort)" -ForegroundColor Red
-        exit
-    }
-    
-    # Some User-Output about the selected or default settings
-        
-=======
         Write-Host "Check your input! Invalid Port-Range... (-StartPort can't be lower than -EndPort)" -ForegroundColor Red 
         exit    
     }
@@ -102,7 +90,6 @@ Begin{
     Write-Host "| Port-Range:`t$StartPort-$EndPort"
     Write-Host "| Threads:`t`t$Threads"
     Write-Host "|`n+---------------------------------------------------------------------------------------`n"         
->>>>>>> origin/master
 }
 
 Process{
