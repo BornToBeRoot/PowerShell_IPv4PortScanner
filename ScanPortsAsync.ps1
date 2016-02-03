@@ -49,11 +49,12 @@ Begin{
     # Validate Port-Range
     if($StartPort -gt $EndPort)
     {
-        
+        Write-Host "Check your input! Invalid Port-Range (-StartPort can't be lower than -EndPort)" -ForegroundColor Red
+        exit
     }
     
     # Some User-Output about the selected or default settings
-    
+        
 }
 
 Process{
