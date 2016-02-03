@@ -1,4 +1,4 @@
-# PowerShell-Async-PortScanner
+# PowerShell Async PortScanner
 
 Powerful asynchronus Port-Scanner which returns a custom PowerShell-Object with basic informations about the scanned Port-Range include Port and Status.
 
