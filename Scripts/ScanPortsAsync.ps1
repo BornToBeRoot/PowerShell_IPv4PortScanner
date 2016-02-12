@@ -19,10 +19,13 @@
     pipe the output of the IP-Scanner result in this script.
     If you found a bug or have some ideas to improve this script... Let me know. You find my Github profile in
     the links below.
+    
     .EXAMPLE
     .\ScanPortsAsync.ps1 -IPv4Address 172.16.0.1 -StartPort 1 -EndPort 1000
+    
     .EXAMPLE
     .\ScanPortsAsync.ps1 -IPv4Address 192.168.1.100 -IncludeClosed
+    
     .LINK
     Github Profil:         https://github.com/BornToBeRoot
     Github Repository:     https://github.com/BornToBeRoot/PowerShell-Async-PortScanner
