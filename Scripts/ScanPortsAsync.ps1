@@ -88,11 +88,11 @@ Begin{
     
     # Some User-Output about the selected or default settings
     Write-Host "`nScript ($ScriptFileName) started at $StartTime" -ForegroundColor Green
-    Write-Host "`n+---------------------------------------Settings----------------------------------------`n|"
+    Write-Host "`n+=-=-=-=-=-=-=-=-=-=-=-= Settings =-=-=-=-=-=-=-=-=-=-=-=`n|"
     Write-Host "| IP-Address:`t$IPv4Address"
     Write-Host "| Port-Range:`t$StartPort-$EndPort"
-    Write-Host "| Threads:`t`t$Threads"
-    Write-Host "|`n+---------------------------------------------------------------------------------------`n"         
+    Write-Host "| Threads:`t$Threads"
+    Write-Host "|`n+========================================================`n"         
 }
 
 Process{
@@ -183,10 +183,10 @@ End{
     $ExecutionTimeSeconds = (New-TimeSpan -Start $StartTime -End $EndTime).Seconds
         
     # Some User-Output with Device UP/Down and execution time
-    Write-Host "`n+----------------------------------------Result-----------------------------------------`n|"
+    Write-Host "`n+=-=-=-=-=-=-=-=-=-=-=-=  Result  =-=-=-=-=-=-=-=-=-=-=-=`n|"
     Write-Host "|  Ports Open:`t`t$(@($Results | Where-Object {($_.Status -eq "Open")}).Count)" 
     Write-Host "|  Ports Closed:`t$(@($Results | Where-Object {($_.Status -eq "Closed")}).Count)"
-    Write-Host "|`n+---------------------------------------------------------------------------------------`n"
+    Write-Host "|`n+========================================================`n"
     Write-Host "Script duration:`t$ExecutionTimeMinutes Minutes $ExecutionTimeSeconds Seconds`n" -ForegroundColor Yellow
     Write-Host "Script ($ScriptFileName) exit at $EndTime`n" -ForegroundColor Green
             
