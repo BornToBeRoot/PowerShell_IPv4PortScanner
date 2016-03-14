@@ -3,7 +3,7 @@
 # Script Name  :  ScanPortsAsync.ps1
 # Autor        :  BornToBeRoot (https://github.com/BornToBeRoot)
 # Description  :  Asynchronus Port Scanner
-# Repository   :  https://github.com/BornToBeRoot/PowerShell-Async-PortScanner
+# Repository   :  https://github.com/BornToBeRoot/PowerShell_Async-PortScanner
 ###############################################################################################################
 
 <#
@@ -28,7 +28,7 @@
     
     .LINK
     Github Profil:         https://github.com/BornToBeRoot
-    Github Repository:     https://github.com/BornToBeRoot/PowerShell-Async-PortScanner
+    Github Repository:     https://github.com/BornToBeRoot/PowerShell_Async-PortScanner
 #>
 
 [CmdletBinding()]
