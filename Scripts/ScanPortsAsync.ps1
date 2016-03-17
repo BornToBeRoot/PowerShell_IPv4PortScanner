@@ -2,7 +2,7 @@
 # Language     :  PowerShell 4.0
 # Script Name  :  ScanPortsAsync.ps1
 # Autor        :  BornToBeRoot (https://github.com/BornToBeRoot)
-# Description  :  Asynchronus Port Scanner
+# Description  :  Asynchronus Port Scanner for PowerShell
 # Repository   :  https://github.com/BornToBeRoot/PowerShell_Async-PortScanner
 ###############################################################################################################
 
@@ -87,12 +87,12 @@ Begin{
     
     $PortRange = ($EndPort - $StartPort)
         
-    # Port list can be updated from IANA.org with the parameter "-UpdatePortList
+    # Port list can be updated from IANA.org with the parameter "-UpdateListFromIANA
     if($UpdateListFromIANA)
     {
         try
         {
-            Write-Host "Updating Service Name and Transport Protocol Port Number Registry from IANA...`t" -ForegroundColor Gray -NoNewline
+            Write-Host "Updating Service Name and Transport Protocol Port Number Registry from IANA.org...`t" -ForegroundColor Gray -NoNewline
 
             [xml]$New_XML_PortList = Invoke-WebRequest -Uri $IANA_PortList_WebUri # Download latest xml-file from IANA
 
