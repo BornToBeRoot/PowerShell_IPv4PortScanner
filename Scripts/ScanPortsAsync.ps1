@@ -77,17 +77,8 @@ Begin{
    
     # Local path to PortList
     $XML_PortList_Path = "$Script_Startup_Path\ServiceName_and_TransportProtocolPortNumber_Registry.xml"
-            
-    # Validate Port-Range
-    if($StartPort -gt $EndPort)
-    {
-        Write-Host "Check your input! Invalid Port-Range... (-StartPort can't be lower than -EndPort)" -ForegroundColor Red 
-        exit    
-    }
     
-    $PortRange = ($EndPort - $StartPort)
-        
-    # Port list can be updated from IANA.org with the parameter "-UpdateListFromIANA
+	# Port list can be updated from IANA.org with the parameter "-UpdateListFromIANA
     if($UpdateListFromIANA)
     {
         try
@@ -96,7 +87,10 @@ Begin{
 
             [xml]$New_XML_PortList = Invoke-WebRequest -Uri $IANA_PortList_WebUri # Download latest xml-file from IANA
 
-            Remove-Item $XML_PortList_Path -Force -ErrorAction SilentlyContinue # Don`t show errors if there is no old file
+            if([System.IO.File]::Exists($XML_PortList_Path))
+            {
+                Remove-Item -Path $XML_PortList_Path
+            }
 
             $New_XML_PortList.Save($XML_PortList_Path) # Save xml-file
 
@@ -106,7 +100,7 @@ Begin{
         {
             $ErrorMsg = $_.Exception.Message
             
-            Write-Host "Update Service Name and Transport Protocol Port Number Registry from IANA failed with the follwing error message: $ErrorMsg"  -ForegroundColor Red
+            Write-Host "Update Service Name and Transport Protocol Port Number Registry from IANA.org failed with the follwing error message: $ErrorMsg"  -ForegroundColor Red
         }        
     }  
     elseif(-Not([System.IO.File]::Exists($XML_PortList_Path)))
@@ -122,6 +116,13 @@ Begin{
     { 
         $AssignServiceWithPorts = $false 
     }
+	
+    # Validate Port-Range
+    if($StartPort -gt $EndPort)
+    {
+        Write-Host "Check your input! Invalid Port-Range... (-StartPort can't be lower than -EndPort)" -ForegroundColor Red 
+        exit    
+    }             
 
     if(-not( Test-Connection -ComputerName $IPv4Address -Count 2 -Quiet))
     {
@@ -179,6 +180,8 @@ Process{
     #Setting up jobs
     Write-Host "Setting up jobs...`t`t`t" -ForegroundColor Yellow -NoNewline
 
+	$PortRange = ($EndPort - $StartPort)
+	
     foreach($Port in $StartPort..$EndPort)
     {
         if($PortRange -gt 0) { $Progress_Percent = (($Port - $StartPort) / $PortRange) * 100 } else { $Progress_Percent = 100 }
@@ -271,12 +274,14 @@ End{
         $Results = $Ports_Open 
     }
 
+	# Time when the Script finished
     $EndTime = Get-Date
         
+	# Calculate the time between Start and End
     $ExecutionTimeMinutes = (New-TimeSpan -Start $StartTime -End $EndTime).Minutes
     $ExecutionTimeSeconds = (New-TimeSpan -Start $StartTime -End $EndTime).Seconds
         
-    # Some User-Output with Device UP/Down and execution time
+    # Some User-Output with ports scanned/up and execution time
     Write-Host "`n+=-=-=-=-=-=-=-=-=-=-=-=  Result  =-=-=-=-=-=-=-=-=-=-=-=`n|"
     Write-Host "|  Ports Scanned:`t$($Jobs_Result.Count)"
     Write-Host "|  Ports Open:`t`t$(@($Results | Where-Object {($_.Status -eq "open")}).Count)"     
