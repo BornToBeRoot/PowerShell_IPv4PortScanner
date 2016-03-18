@@ -234,7 +234,7 @@ Process{
         # Go through each port
         foreach($Port_Open in $Ports_Open)
         {
-            # go through each service
+            # Go through each service
             foreach($XML_Node in $XML_PortList.Registry.Record)
             {
                 # Find the right service (based on protocol and port number)
@@ -250,6 +250,8 @@ Process{
 
                     # Add it to an array
                     $Ports_Open_Assigned += $Port_Open_Assigned
+
+                    break # Don't show multiple results
                 }
             }
         }        
