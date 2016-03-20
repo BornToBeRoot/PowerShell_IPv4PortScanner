@@ -8,7 +8,7 @@ This is a powerful asynchronus Port-Scanner working with the PowerShell Runspace
     
 This script also work fine along with my asychronus IP-Scanner published on GitHub too. You can easily pipe the output of the IP-Scanner result in this script.
 
-![Screenshot of Working Scanner and Result](https://github.com/BornToBeRoot/PowerShell_Async-PortScanner/blob/master/Screenshots/Working_and_Result.png?raw=true)
+![Screenshot of Working Scanner and Result](https://github.com/BornToBeRoot/PowerShell_Async-PortScanner/blob/master/Images/Working_and_Result.png?raw=true)
 
 ## Syntax
 
