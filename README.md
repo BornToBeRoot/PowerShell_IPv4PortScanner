@@ -1,10 +1,10 @@
 # PowerShell Async Port-Scanner
 
-Powerful asynchronus Port-Scanner which returns a custom PowerShell-Object with basic informations about the scanned Port-Range include port number, protocol, service name, service description and status.
+Powerful asynchronus Port-Scanner which returns a custom PowerShell-Object with basic informations about the scanned Port-Range include Port-Number, Protocol, Service-Name, Service-Description and Status.
 
 ## Description
 
-This is a powerful asynchronus Port-Scanner working with the PowerShell RunspacePool. You can scan any Port-Range you want. The Result will show you all open ports port number, protocol, service name, service description and status.
+This is a powerful asynchronus Port-Scanner working with the PowerShell RunspacePool. You can scan any Port-Range you want. The Result will show you all open ports Port-Number, Protocol, Service-Name, Service-Description and Status.
     
 This script also work fine along with my asychronus IP-Scanner published on GitHub too. You can easily pipe the output of the IP-Scanner result in this script.
 
@@ -38,8 +38,8 @@ If your PC has enough power, you can use more threads at the same time
 ## Output 
 
 ```powershell
-Port Protocol Service Name Service Description              Status
----- -------- ------------ -------------------              ------
+Port Protocol ServiceName  ServiceDescription               Status
+---- -------- -----------  ------------------               ------
   21 tcp      ftp          File Transfer Protocol [Control] open
   53 tcp      domain       Domain Name Server               open
   80 tcp      http         World Wide Web HTTP              open
