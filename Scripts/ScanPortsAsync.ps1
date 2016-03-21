@@ -218,7 +218,10 @@ Process{
     foreach($Job in $Jobs)
     {
         $Jobs_Result += $Job.Pipe.EndInvoke($Job.Result)
-    }
+		$Job.Pipe.Dispose()
+	}
+
+	$RunspacePool.Close()
 
     # Only get open ports (others are closed -.- )
     $Ports_Open = $Jobs_Result | Where-Object {$_.Status -eq "open"}
