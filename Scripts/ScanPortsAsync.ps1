@@ -161,9 +161,9 @@ Process{
         }
     
         $Result = New-Object -TypeName PSObject
-        Add-Member -InputObject $Result -MemberType NoteProperty -Name "Port" -Value $Port
-        Add-Member -InputObject $Result -MemberType NoteProperty -Name "Protocol" -Value "tcp"
-        Add-Member -InputObject $Result -MemberType NoteProperty -Name "Status" -Value $Status
+        Add-Member -InputObject $Result -MemberType NoteProperty -Name Port -Value $Port
+        Add-Member -InputObject $Result -MemberType NoteProperty -Name Protocol -Value "tcp"
+        Add-Member -InputObject $Result -MemberType NoteProperty -Name Status -Value $Status
 
         return $Result    
     }
@@ -245,11 +245,11 @@ Process{
                 {
                     # Built new custom PSObject
                     $Port_Open_Assigned = New-Object -TypeName PSObject
-                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name "Port" -Value $Port_Open.Port
-                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name "Protocol" -Value $Port_Open.Protocol
-                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name "Service Name" -Value $XML_Node.name
-                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name "Service Description" -Value $XML_Node.description
-                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name "Status" -Value $Port_Open.Status
+                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name Port -Value $Port_Open.Port
+                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name Protocol -Value $Port_Open.Protocol
+                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name ServiceName -Value $XML_Node.name
+                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name ServiceDescription -Value $XML_Node.description
+                    Add-Member -InputObject $Port_Open_Assigned -MemberType NoteProperty -Name Status -Value $Port_Open.Status
 
                     # Add it to an array
                     $Ports_Open_Assigned += $Port_Open_Assigned
