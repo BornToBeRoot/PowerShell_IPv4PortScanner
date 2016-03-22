@@ -12,23 +12,24 @@
     scanned Port-Range include Port-Number, Protocol, Service-Name, Service-Description and Status.
     
     .DESCRIPTION
-    This is a powerful asynchronus Port-Scanner working with the PowerShell RunspacePool. You can scan any 
-    Port-Range you want. The result will show you all open ports with include Port-Number, Protocol, 
-    Service-Name, Service-Description and Status.
+	This is a powerful asynchronus Port-Scanner working with the PowerShell RunspacePool. You can scan any Port-Range 
+	you want. The result will show you all open ports Port-Number, Protocol, Service-Name, Service-Description and 
+	Status.
     
     This script also work fine along with my asychronus IP-Scanner published on GitHub too. You can easily
     pipe the output of the IP-Scanner result in this script.
+
     If you found a bug or have some ideas to improve this script... Let me know. You find my Github profile in
     the links below.
     
     .EXAMPLE
-    .\ScanPortsAsync.ps1 -IPv4Address 172.16.0.1 -StartPort 1 -EndPort 1000
+    .\ScanPortsAsync.ps1 -ComputerName 172.16.0.1 -StartPort 1 -EndPort 1000
     
     .EXAMPLE
-    .\ScanPortsAsync.ps1 -IPv4Address 192.168.1.100 -UpdateListFromIANA
+    .\ScanPortsAsync.ps1 -ComputerName 192.168.1.100 -UpdateListFromIANA
 
     .EXAMPLE
-    .\ScanPortsAsync.ps1 -IPv4Address 192.168.1.100 -Threads 250
+    .\ScanPortsAsync.ps1 -ComputerName 192.168.1.100 -Threads 250
     
     .LINK
     Github Profil:         https://github.com/BornToBeRoot
@@ -41,7 +42,7 @@ Param(
         Position=0,
         Mandatory=$true,
         HelpMessage='Enter IP-Address of the device which you want to scan')]
-    [IPAddress]$IPv4Address,
+    [String]$ComputerName,
 
     [Parameter(
         Position=1,
@@ -61,7 +62,13 @@ Param(
     [Parameter(
         Position=4,
         HelpMessage='Update Service Name and Transport Protocol Port Number Registry from IANA.org (https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml)')]
-    [Switch]$UpdateListFromIANA
+    [Switch]$UpdateListFromIANA,
+
+	[Parameter(
+		Position=5,
+		HelpMessage='Execute script without user interaction'
+	)]
+	[Switch]$Force
 )
 
 Begin{
@@ -124,11 +131,56 @@ Begin{
         exit    
     }             
 
-    if(-not( Test-Connection -ComputerName $IPv4Address -Count 2 -Quiet))
+	# Check if Host is reachable
+    if(-not( Test-Connection -ComputerName $ComputerName -Count 2 -Quiet))
     {
-        Write-Host "IP-Address not reachable!" -ForegroundColor Red
-        exit
+        Write-Host "$ComputerName not reachable!" -ForegroundColor Red
+        
+		if($Force -eq $false)
+		{
+			while("yes","no" -notcontains $Answer)
+			{
+				$Answer = Read-Host "Would you like to continue? (maybe ICMP is blocked) [yes|no]"
+			}
+		
+			if($Answer -eq "no")
+			{	
+				exit
+			}
+		}
     }
+
+	# Check if Hostname or IP-Address
+	$IPv4Address = [String]::Empty
+	
+	if([bool]($ComputerName -as [IPAddress]))
+	{
+		$IPv4Address = $ComputerName
+	}
+	else
+	{
+		# Get IP from Hostname (IPv4 only)
+		try{
+			$AddressList = @(([System.Net.Dns]::GetHostEntry($ComputerName)).AddressList)
+			
+			foreach($Address in $AddressList)
+			{
+				if($Address.AddressFamily -eq "InterNetwork") 
+				{					
+					$IPv4Address = $Address.IPAddressToString 
+					break					
+				}
+			}					
+		}
+		catch{ }	# Can't get IPAddressList 					
+		finally{
+			if([String]::IsNullOrEmpty($IPv4Address))
+			{
+				Write-Host "Could not get IPv4-Address from $ComputerName. (Enter IP-Address instead of Hostname)" -ForegroundColor Red
+				exit
+			}
+		}
+	}
     
     # Some User-Output about the selected or default settings
     Write-Host "`nScript ($ScriptFileName) started at $StartTime" -ForegroundColor Green
@@ -142,22 +194,22 @@ Begin{
 Process{
     # Scriptblock that will run in runspaces (threads)...
     [System.Management.Automation.ScriptBlock]$ScriptBlock = {
-        # Parameters
-        $IPv4Address = $args[0]
-        $Port = $args[1]
-               
+        Param(
+			$IPv4Address,
+			$Port
+        )
+		     
         try{                      
             $Socket = New-Object System.Net.Sockets.TcpClient($IPv4Address,$Port)
             
             if($Socket.Connected)
             {
-                $Status = "open"             
+                $Status = "Open"             
                 $Socket.Close()
             }
         }
-        catch
-        {
-            $Status = "closed"
+        catch{
+            $Status = "Closed"
         }
     
         $Result = New-Object -TypeName PSObject
@@ -184,12 +236,25 @@ Process{
 	
     foreach($Port in $StartPort..$EndPort)
     {
-        if($PortRange -gt 0) { $Progress_Percent = (($Port - $StartPort) / $PortRange) * 100 } else { $Progress_Percent = 100 }
-        Write-Progress -Activity "Setting up jobs..." -Id 1 -Status "Current Port: $Port"  -PercentComplete ($Progress_Percent)
+		$ScriptParams =@{
+			IPv4Address = $IPv4Address
+			Port = $Port
+		}
+
+        if($PortRange -gt 0) 
+		{ 
+			$Progress_Percent = (($Port - $StartPort) / $PortRange) * 100 
+		} 
+		else 
+		{ 
+			$Progress_Percent = 100 
+		}
         
-        $Job = [System.Management.Automation.PowerShell]::Create().AddScript($ScriptBlock).AddArgument($IPv4Address).AddArgument($Port)
+		Write-Progress -Activity "Setting up jobs..." -Id 1 -Status "Current Port: $Port"  -PercentComplete ($Progress_Percent)
+        
+        $Job = [System.Management.Automation.PowerShell]::Create().AddScript($ScriptBlock).AddParameters($ScriptParams)
         $Job.RunspacePool = $RunspacePool
-        $Jobs += New-Object psobject -Property @{
+        $Jobs += New-Object PSObject -Property @{
             RunNum = $Port - $StartPort
             Pipe = $Job
             Result = $Job.BeginInvoke()
@@ -223,13 +288,13 @@ Process{
 
 	$RunspacePool.Close()
 
-    # Only get open ports (others are closed -.- )
-    $Ports_Open = $Jobs_Result | Where-Object {$_.Status -eq "open"}
+    # Only get open ports (others are closed :/ )
+    $Ports_Open = $Jobs_Result | Where-Object {$_.Status -eq "Open"}
 
     Write-Host "[" -ForegroundColor Gray -NoNewline; Write-Host "Done" -ForegroundColor Green -NoNewline; Write-Host "]" -ForegroundColor Gray	
     
     # Assign service with ports
-    if($AssignServiceWithPorts)
+    if(($Ports_Open -ne $null) -and ($AssignServiceWithPorts))
     {
         Write-Host "Assign services to ports...`t`t" -ForegroundColor Yellow -NoNewline
         
@@ -268,13 +333,13 @@ Process{
 
 End{  
     # If no XML-File to assign service with port... only show open ports  
-    if($AssignServiceWithPorts) 
+    if(($Ports_Open -ne $null) -and ($AssignServiceWithPorts))
     { 
         $Results = $Ports_Open_Assigned 
     } 
     else 
     { 
-        $Results = $Ports_Open 
+        $Results = $Ports_Open
     }
 
 	# Time when the Script finished
