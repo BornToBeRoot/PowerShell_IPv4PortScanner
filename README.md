@@ -13,7 +13,7 @@ This script also work fine along with my [asychronus IP-Scanner](https://github.
 ## Syntax
 
 ```powershell
-.\ScanPortsAsync.ps1 [-IPv4Address] <IPAddress> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-UpdateListFromIANA]] [<CommonParameters>]
+.\ScanPortsAsync.ps1 [-ComputerName] <String> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-UpdateListFromIANA]] [[-Force]] [<CommonParameters>]
 ```
 
 ## Example
@@ -21,19 +21,19 @@ This script also work fine along with my [asychronus IP-Scanner](https://github.
 Scan a specific Port-Range (1-500)
 
 ```powershell
-.\ScanPortsAsync.ps1 -IPv4Address 192.168.1.100 -StartPort 1 -EndPort 500 | Format-Table
+.\ScanPortsAsync.ps1 -ComputerName 192.168.1.100 -StartPort 1 -EndPort 500 | Format-Table
 ``` 
 
-You may want to update the official Service Name and Transport Protocol Port Number Registry from IANA... Just add the parameter "-UpdateListFromIANA".
+You may want to update the official "Service Name and Transport Protocol Port Number Registry" from IANA... Just add the parameter "-UpdateListFromIANA".
 
 ```powershell
-.\ScanPortsAsync.ps1 -IPv4Address 172.16.2.5 -UpdateListFromIANA
+.\ScanPortsAsync.ps1 -ComputerName 172.16.2.5 -UpdateListFromIANA
 ``` 
 If your PC has enough power, you can use more threads at the same time
 
 ```powershell
-.\ScanPortsAsync.ps1 -IPv4Address 172.16.2.5 -Threads 250
-``` 
+.\ScanPortsAsync.ps1 -ComputerName test-pc01 -Threads 250
+```
 
 ## Output 
 
@@ -43,8 +43,6 @@ Port Protocol ServiceName  ServiceDescription               Status
   21 tcp      ftp          File Transfer Protocol [Control] open
   53 tcp      domain       Domain Name Server               open
   80 tcp      http         World Wide Web HTTP              open
-  80 tcp      www          World Wide Web HTTP              open
-  80 tcp      www-http     World Wide Web HTTP              open
  139 tcp      netbios-ssn  NETBIOS Session Service          open
  445 tcp      microsoft-ds Microsoft-DS                     open
 ``` 
@@ -67,3 +65,4 @@ Port Protocol Status
 
 ## ToDo
 [x] Integrate Port-List like: 80 (http), 443 (https), etc.
+[x] You can now enter a hostname as -ComputerName. The script will resolve the IPv4-Address.
