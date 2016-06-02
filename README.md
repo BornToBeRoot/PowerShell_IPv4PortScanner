@@ -65,4 +65,5 @@ Port Protocol Status
 
 ## ToDo
 [x] Integrate Port-List like: 80 (http), 443 (https), etc.
+
 [x] You can now enter a hostname as -ComputerName. The script will resolve the IPv4-Address.
