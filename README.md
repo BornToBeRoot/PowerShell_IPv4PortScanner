@@ -62,8 +62,3 @@ Port Protocol Status
 ## Offical Port List
 
 * [Service Name and Transport Protocol Port Number Registry - IANA.org](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml)
-
-## ToDo
-[x] Integrate Port-List like: 80 (http), 443 (https), etc.
-
-[x] You can now enter a hostname as -ComputerName. The script will resolve the IPv4-Address.
