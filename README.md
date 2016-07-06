@@ -16,6 +16,8 @@ To reach the best possible performance, this script uses a [RunspacePool](https:
 
 If you are looking for a module containing this script... you can find it [here](https://github.com/BornToBeRoot/PowerShell)!
 
+Maybe you're also interested in my asynchronus [IPv4 Network Scanner](https://github.com/BornToBeRoot/PowerShell_IPv4NetworkScanner).
+
 ## Syntax
 
 ```powershell
@@ -32,6 +34,4 @@ Port Protocol ServiceName  ServiceDescription               Status
   21 tcp      ftp          File Transfer Protocol [Control] open
   53 tcp      domain       Domain Name Server               open
   80 tcp      http         World Wide Web HTTP              open
- 139 tcp      netbios-ssn  NETBIOS Session Service          open
- 445 tcp      microsoft-ds Microsoft-DS                     open
 ``` 

@@ -23,8 +23,6 @@
       21 tcp      ftp          File Transfer Protocol [Control] open
       53 tcp      domain       Domain Name Server               open
       80 tcp      http         World Wide Web HTTP              open
-     139 tcp      netbios-ssn  NETBIOS Session Service          open
-     445 tcp      microsoft-ds Microsoft-DS                     open
     
     .LINK
     https://github.com/BornToBeRoot/PowerShell_IPv4PortScanner/blob/master/README.md
