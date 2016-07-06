@@ -1,43 +1,32 @@
-# PowerShell Async Port-Scanner
+# PowerShell - IPv4 Port Scanner
 
-Powerful asynchronus Port-Scanner which returns a custom PowerShell-Object with basic informations about the scanned Port-Range include Port-Number, Protocol, Service-Name, Service-Description and Status.
+Powerful asynchronus IPv4 Port Scanner for PowerShell.
 
 ## Description
 
-This is a powerful asynchronus Port-Scanner working with the PowerShell RunspacePool. You can scan any Port-Range you want. The result will show you all open ports Port-Number, Protocol, Service-Name, Service-Description and Status.
-    
-This script also work fine along with my [asychronus IP-Scanner](https://github.com/BornToBeRoot/PowerShell_Async-IPScanner) published on GitHub too. You can easily pipe the output of the IP-Scanner result in this script.
+This powerful asynchronus IPv4 Port Scanner allows you to scan every Port-Range you want (500 to 2600 would work). Only TCP-Ports are scanned.
 
-![Screenshot of Working Scanner and Result](https://github.com/BornToBeRoot/PowerShell_Async-PortScanner/blob/master/Documentation/ScanPortsAsync_Result.png?raw=true)
+The result will contain the Port number, Protocol, Service name, Description and the Status.
+
+![Screenshot](Documentation/Images/New-IPv4PortScan.png?raw=true "New-IPv4PortScan")
+
+To reach the best possible performance, this script uses a [RunspacePool](https://msdn.microsoft.com/en-US/library/system.management.automation.runspaces.runspacepool(v=vs.85).aspx). As you can see in the following screenshot, the individual tasks are distributed across all cpu cores:
+
+![Screenshot](Documentation/Images/New-IPv4PortScan_CPUusage.png?raw=true "CPU usage")
+
+If you are looking for a module... you can find it [here](https://github.com/BornToBeRoot/PowerShell)!
 
 ## Syntax
 
 ```powershell
-.\ScanPortsAsync.ps1 [-ComputerName] <String> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-UpdateListFromIANA]] [[-Force]] [<CommonParameters>]
+.\New-IPv4PortScan.ps1 [-ComputerName] <String> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-Force]] [[-UpdateList]] [<CommonParameters>]
 ```
 
 ## Example
 
-Scan a specific Port-Range (1-500)
-
 ```powershell
-.\ScanPortsAsync.ps1 -ComputerName 192.168.1.100 -StartPort 1 -EndPort 500 | Format-Table
-``` 
+PS> .\New-IPv4PortScan.ps1 -ComputerName fritz.box -EndPort 500
 
-You may want to update the official "Service Name and Transport Protocol Port Number Registry" from IANA... Just add the parameter "-UpdateListFromIANA".
-
-```powershell
-.\ScanPortsAsync.ps1 -ComputerName 172.16.2.5 -UpdateListFromIANA
-``` 
-If your PC has enough power, you can use more threads at the same time
-
-```powershell
-.\ScanPortsAsync.ps1 -ComputerName test-pc01 -Threads 250
-```
-
-## Output 
-
-```powershell
 Port Protocol ServiceName  ServiceDescription               Status
 ---- -------- -----------  ------------------               ------
   21 tcp      ftp          File Transfer Protocol [Control] open
@@ -46,19 +35,3 @@ Port Protocol ServiceName  ServiceDescription               Status
  139 tcp      netbios-ssn  NETBIOS Session Service          open
  445 tcp      microsoft-ds Microsoft-DS                     open
 ``` 
-
-and if no port list is available (should never happend, because it's uploaded on Github)
-
-```powershell
-Port Protocol Status
----- -------- ------
-  21 tcp      open
-  53 tcp      open
-  80 tcp      open
- 139 tcp      open
- 445 tcp      open
-```
-
-## Offical Port List
-
-* [Service Name and Transport Protocol Port Number Registry - IANA.org](https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml)
