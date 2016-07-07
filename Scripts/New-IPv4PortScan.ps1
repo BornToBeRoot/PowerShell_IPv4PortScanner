@@ -39,11 +39,13 @@ param(
     [Parameter(
         Position=1,
         HelpMessage='First port which should be scanned (Default=1)')]
+    [ValidateRange(1,65535)]
     [Int32]$StartPort=1,
 
     [Parameter(
         Position=2,
         HelpMessage='Last port which should be scanned (Default=65535)')]
+    [ValidateRange(1,65535)]
     [Int32]$EndPort=65535,
 
     [Parameter(
