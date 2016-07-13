@@ -194,7 +194,7 @@ Process{
     {
         Write-Host "$ComputerName is not reachable!" -ForegroundColor Red
 
-        if($Force -eq $false)
+        if($Force.IsPresent -eq $false)
         {
             do {
                 $Answer = Read-Host "Would you like to continue? (perhaps only ICMP is blocked) [yes|no]"
