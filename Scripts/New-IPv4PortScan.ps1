@@ -160,7 +160,7 @@ Begin{
 }
 
 Process{
-    if($UpdateList.IsPresent)
+    if($UpdateList)
     {
         UpdateListFromIANA
     }
@@ -194,7 +194,7 @@ Process{
     {
         Write-Host "$ComputerName is not reachable!" -ForegroundColor Red
 
-        if($Force.IsPresent -eq $false)
+        if($Force -eq $false)
         {
             do {
                 $Answer = Read-Host "Would you like to continue? (perhaps only ICMP is blocked) [yes|no]"
