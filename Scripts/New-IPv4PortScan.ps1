@@ -65,7 +65,7 @@ param(
 )
 
 Begin{
-    Write-Verbose "Script started at $(Get-Date)"
+    Write-Verbose -Message "Script started at $(Get-Date)"
 
     # IANA --> Service Name and Transport Protocol Port Number Registry -> xml-file
     $IANA_PortList_WebUri = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml"
@@ -78,7 +78,7 @@ Begin{
     function UpdateListFromIANA
     {
         try{
-            Write-Verbose "Create backup of the IANA Service Name and Transport Protocol Port Number Registry..."
+            Write-Verbose -Message "Create backup of the IANA Service Name and Transport Protocol Port Number Registry..."
 
             # Backup file, before donload a new version
             if([System.IO.File]::Exists($XML_PortList_Path))
@@ -86,7 +86,7 @@ Begin{
                 Rename-Item -Path $XML_PortList_Path -NewName $XML_PortList_BackupPath
             }
 
-            Write-Verbose "Updating Service Name and Transport Protocol Port Number Registry from IANA.org..."
+            Write-Verbose -Message "Updating Service Name and Transport Protocol Port Number Registry from IANA.org..."
 
             # Download xml-file from IANA and save it
             [xml]$New_XML_PortList = Invoke-WebRequest -Uri $IANA_PortList_WebUri -ErrorAction Stop
@@ -100,7 +100,7 @@ Begin{
             }
         }
         catch{
-            Write-Verbose "Cleanup downloaded file and restore backup..."
+            Write-Verbose -Message "Cleanup downloaded file and restore backup..."
 
             # On error: cleanup downloaded file and restore backup
             if([System.IO.File]::Exists($XML_PortList_Path))
@@ -142,15 +142,13 @@ Begin{
                 }
             }
                 
-            $NewResult = [pscustomobject] @{
+            [pscustomobject] @{
                 Port = $Result.Port
                 Protocol = $Result.Protocol
                 ServiceName = $Service
                 ServiceDescription = $Description
                 Status = $Result.Status
             }
-
-            return $NewResult
         }  
 
         End{
@@ -166,7 +164,7 @@ Process{
     }
     elseif(-Not([System.IO.File]::Exists($XML_PortList_Path)))
     {
-        Write-Host 'No xml-file to assign service with port found! Use the parameter "-UpdateList" to download the latest version from IANA.org. This warning doesn`t affect the scanning procedure.' -ForegroundColor Yellow
+        Write-Warning -Message "No xml-file to assign service with port found! Use the parameter ""-UpdateList"" to download the latest version from IANA.org. This warning doesn`t affect the scanning procedure."
     }
 
     # Check if it is possible to assign service with port --> import xml-file
@@ -184,34 +182,37 @@ Process{
     # Validate Port-Range
     if($StartPort -gt $EndPort)
     {
-        Write-Host "Invalid Port-Range... Check your input!" -ForegroundColor Red
-        return
+        Write-Error -Message "Invalid Port-Range... Check your input!" -Category InvalidArgument -ErrorAction Stop
     }
 
     # Check if host is reachable
-    Write-Verbose "Test if host is reachable..."
+    Write-Verbose -Message "Test if host is reachable..."
     if(-not(Test-Connection -ComputerName $ComputerName -Count 2 -Quiet))
     {
-        Write-Host "$ComputerName is not reachable!" -ForegroundColor Red
+        Write-Warning -Message "$ComputerName is not reachable!"
 
         if($Force -eq $false)
         {
-            do {
-                $Answer = Read-Host "Would you like to continue? (perhaps only ICMP is blocked) [yes|no]"
+            $Title = "Continue"
+            $Info = "Would you like to continue? (perhaps only ICMP is blocked)"
+            
+            $Options = [System.Management.Automation.Host.ChoiceDescription[]] @("&Yes", "&No")
+            [int]$Defaultchoice = 0
+            $Opt =  $host.UI.PromptForChoice($Title , $Info, $Options, $Defaultchoice)
 
-            } while("yes","y","no","n" -notcontains $Answer)
-        
-            if("no","n" -contains $Answer)
-            {
-                return
+            switch($Opt)
+            {                    
+                1 { 
+                    return
+                }
             }
         }
     }
 
     $PortsToScan = ($EndPort - $StartPort)
 
-    Write-Verbose "Scanning range from $StartPort to $EndPort ($PortsToScan Ports)"
-    Write-Verbose "Running with max $Threads threads"
+    Write-Verbose -Message "Scanning range from $StartPort to $EndPort ($PortsToScan Ports)"
+    Write-Verbose -Message "Running with max $Threads threads"
 
     # Check if ComputerName is already an IPv4-Address, if not... try to resolve it
     $IPv4Address = [String]::Empty
@@ -239,8 +240,7 @@ Process{
 
        	if([String]::IsNullOrEmpty($IPv4Address))
 		{
-			Write-Host "Could not get IPv4-Address for $ComputerName. (Try to enter an IPv4-Address instead of the Hostname)" -ForegroundColor Red
-            return
+			Write-Error -Message "Could not get IPv4-Address for $ComputerName. (Try to enter an IPv4-Address instead of the Hostname)" -Category InvalidData -ErrorAction Stop
 		}		
 	}
 
@@ -268,23 +268,21 @@ Process{
             $Status = "Closed"
         }   
 
-        $Result = [pscustomobject] @{
+        [pscustomobject] @{
             Port = $Port
             Protocol = "tcp"
         	Status = $Status
         }
-
-        return $Result
     }
 
-    Write-Verbose "Setting up RunspacePool..."
+    Write-Verbose -Message "Setting up RunspacePool..."
 
     # Create RunspacePool and Jobs
     $RunspacePool = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspacePool(1, $Threads, $Host)
     $RunspacePool.Open()
     [System.Collections.ArrayList]$Jobs = @()
 
-    Write-Verbose "Setting up Jobs..."
+    Write-Verbose -Message "Setting up Jobs..."
     
     #Set up job for each port...
     foreach($Port in $StartPort..$EndPort)
@@ -318,7 +316,7 @@ Process{
         [void]$Jobs.Add($JobObj)
     }
 
-    Write-Verbose "Waiting for jobs to complete & starting to process results..."
+    Write-Verbose -Message "Waiting for jobs to complete & starting to process results..."
 
     # Total jobs to calculate percent complete, because jobs are removed after they are processed
     $Jobs_Total = $Jobs.Count
@@ -331,7 +329,7 @@ Process{
         # If no jobs finished yet, wait 500 ms and try again
         if($Jobs_ToProcess -eq $null)
         {
-            Write-Verbose "No jobs completed, wait 500ms..."
+            Write-Verbose -Message "No jobs completed, wait 500ms..."
 
             Start-Sleep -Milliseconds 500
             continue
@@ -350,7 +348,7 @@ Process{
 
         Write-Progress -Activity "Waiting for jobs to complete... ($($Threads - $($RunspacePool.GetAvailableRunspaces())) of $Threads threads running)" -Id 1 -PercentComplete $Progress_Percent -Status "$Jobs_Remaining remaining..."
       
-        Write-Verbose "Processing $(if($Jobs_ToProcess.Count -eq $null){"1"}else{$Jobs_ToProcess.Count}) job(s)..."
+        Write-Verbose -Message "Processing $(if($Jobs_ToProcess.Count -eq $null){"1"}else{$Jobs_ToProcess.Count}) job(s)..."
 
         # Processing completed jobs
         foreach($Job in $Jobs_ToProcess)
@@ -378,13 +376,13 @@ Process{
 
     } While ($Jobs.Count -gt 0)
     
-    Write-Verbose "Closing RunspacePool and free resources..."
+    Write-Verbose -Message "Closing RunspacePool and free resources..."
 
     # Close the RunspacePool and free resources
     $RunspacePool.Close()
     $RunspacePool.Dispose()
 
-    Write-Verbose "Script finished at $(Get-Date)"
+    Write-Verbose -Message "Script finished at $(Get-Date)"
 }
 
 End{
