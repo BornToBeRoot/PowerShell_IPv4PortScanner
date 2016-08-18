@@ -8,7 +8,7 @@ This powerful asynchronus IPv4 Port Scanner allows you to scan every Port-Range 
 
 The result will contain the Port number, Protocol, Service name, Description and the Status.
 
-![Screenshot](Documentation/Images/IPv4PortScan.png?raw=true "New-IPv4PortScan")
+![Screenshot](Documentation/Images/IPv4PortScan.png?raw=true "IPv4PortScan")
 
 To reach the best possible performance, this script uses a [RunspacePool](https://msdn.microsoft.com/en-US/library/system.management.automation.runspaces.runspacepool(v=vs.85).aspx). As you can see in the following screenshot, the individual tasks are distributed across all cpu cores:
 
