@@ -1,6 +1,6 @@
 ###############################################################################################################
 # Language     :  PowerShell 4.0
-# Filename     :  New-IPv4PortScan.ps1 
+# Filename     :  IPv4PortScan.ps1 
 # Autor        :  BornToBeRoot (https://github.com/BornToBeRoot)
 # Description  :  Powerful asynchronus IPv4 Port Scanner
 # Repository   :  https://github.com/BornToBeRoot/PowerShell_IPv4PortScanner
@@ -16,11 +16,10 @@
     The result will contain the Port number, Protocol, Service name, Description and the Status.
     
     .EXAMPLE
-    .\New-IPv4PortScan.ps1 -ComputerName fritz.box -EndPort 500
+    .\IPv4PortScan.ps1 -ComputerName fritz.box -EndPort 500
 
     Port Protocol ServiceName  ServiceDescription               Status
     ---- -------- -----------  ------------------               ------
-      21 tcp      ftp          File Transfer Protocol [Control] open
       53 tcp      domain       Domain Name Server               open
       80 tcp      http         World Wide Web HTTP              open
     
@@ -268,10 +267,13 @@ Process{
             $Status = "Closed"
         }   
 
-        [pscustomobject] @{
-            Port = $Port
-            Protocol = "tcp"
-        	Status = $Status
+        if($Status -eq "Open")
+        {
+            [pscustomobject] @{
+                Port = $Port
+                Protocol = "tcp"
+                Status = $Status
+            }
         }
     }
 
@@ -327,7 +329,7 @@ Process{
         $Jobs_ToProcess = $Jobs | Where-Object {$_.Result.IsCompleted}
   
         # If no jobs finished yet, wait 500 ms and try again
-        if($Jobs_ToProcess -eq $null)
+        if($null -eq $Jobs_ToProcess)
         {
             Write-Verbose -Message "No jobs completed, wait 500ms..."
 
@@ -348,7 +350,7 @@ Process{
 
         Write-Progress -Activity "Waiting for jobs to complete... ($($Threads - $($RunspacePool.GetAvailableRunspaces())) of $Threads threads running)" -Id 1 -PercentComplete $Progress_Percent -Status "$Jobs_Remaining remaining..."
       
-        Write-Verbose -Message "Processing $(if($Jobs_ToProcess.Count -eq $null){"1"}else{$Jobs_ToProcess.Count}) job(s)..."
+        Write-Verbose -Message "Processing $(if($null -eq $Jobs_ToProcess.Count){"1"}else{$Jobs_ToProcess.Count}) job(s)..."
 
         # Processing completed jobs
         foreach($Job in $Jobs_ToProcess)
@@ -361,7 +363,7 @@ Process{
             $Jobs.Remove($Job)
            
             # Check if result is null --> if not, return it
-            if($Job_Result -ne $null -and $Job_Result.Status -eq "Open")
+            if($Job_Result.Status)
             {        
                 if($AssignServiceWithPort)
                 {
