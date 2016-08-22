@@ -196,8 +196,8 @@ Process{
             $Info = "Would you like to continue? (perhaps only ICMP is blocked)"
             
             $Options = [System.Management.Automation.Host.ChoiceDescription[]] @("&Yes", "&No")
-            [int]$Defaultchoice = 0
-            $Opt =  $host.UI.PromptForChoice($Title , $Info, $Options, $Defaultchoice)
+            [int]$DefaultChoice = 0
+            $Opt =  $host.UI.PromptForChoice($Title , $Info, $Options, $DefaultChoice)
 
             switch($Opt)
             {                    
@@ -239,7 +239,7 @@ Process{
 
        	if([String]::IsNullOrEmpty($IPv4Address))
 		{
-			Write-Error -Message "Could not get IPv4-Address for $ComputerName. (Try to enter an IPv4-Address instead of the Hostname)" -Category InvalidData -ErrorAction Stop
+			throw "Could not get IPv4-Address for $ComputerName. (Try to enter an IPv4-Address instead of the Hostname)"
 		}		
 	}
 
@@ -326,7 +326,7 @@ Process{
      # Process results, while waiting for other jobs
     Do {
         # Get all jobs, which are completed
-        $Jobs_ToProcess = $Jobs | Where-Object {$_.Result.IsCompleted}
+        $Jobs_ToProcess = $Jobs | Where-Object -FilterScript {$_.Result.IsCompleted}
   
         # If no jobs finished yet, wait 500 ms and try again
         if($null -eq $Jobs_ToProcess)
@@ -338,7 +338,7 @@ Process{
         }
         
         # Get jobs, which are not complete yet
-        $Jobs_Remaining = ($Jobs | Where-Object {$_.Result.IsCompleted -eq $false}).Count
+        $Jobs_Remaining = ($Jobs | Where-Object -FilterScript {$_.Result.IsCompleted -eq $false}).Count
 
         # Catch when trying to divide through zero
         try {            
