@@ -181,7 +181,7 @@ Process{
     # Validate Port-Range
     if($StartPort -gt $EndPort)
     {
-        Write-Error -Message "Invalid Port-Range... Check your input!" -Category InvalidArgument -ErrorAction Stop
+        throw "Invalid Port-Range... Check your input!"
     }
 
     # Check if host is reachable
@@ -302,7 +302,7 @@ Process{
 			$Progress_Percent = 100 
 		}
 
-        Write-Progress -Activity "Setting up jobs..." -Id 1 -Status "Current Port: $Port"  -PercentComplete ($Progress_Percent)
+        Write-Progress -Activity "Setting up jobs..." -Id 1 -Status "Current Port: $Port" -PercentComplete ($Progress_Percent)
         
         # Create mew job
         $Job = [System.Management.Automation.PowerShell]::Create().AddScript($ScriptBlock).AddParameters($ScriptParams)
