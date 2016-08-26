@@ -45,6 +45,16 @@ param(
         Position=2,
         HelpMessage='Last port which should be scanned (Default=65535)')]
     [ValidateRange(1,65535)]
+    [ValidateScript({
+        if($_ -lt $StartPort)
+        {
+            throw "Invalid Port-Range!"
+        }
+        else 
+        {
+            return $true
+        }
+    })]
     [Int32]$EndPort=65535,
 
     [Parameter(
@@ -79,8 +89,8 @@ Begin{
         try{
             Write-Verbose -Message "Create backup of the IANA Service Name and Transport Protocol Port Number Registry..."
 
-            # Backup file, before donload a new version
-            if([System.IO.File]::Exists($XML_PortList_Path))
+            # Backup file, before download a new version
+            if(Test-Path -Path $XML_PortList_Path -PathType Leaf)
             {
                 Rename-Item -Path $XML_PortList_Path -NewName $XML_PortList_BackupPath
             }
@@ -93,7 +103,7 @@ Begin{
             $New_XML_PortList.Save($XML_PortList_Path)
 
             # Remove backup, if no error
-            if([System.IO.File]::Exists($XML_PortList_BackupPath))
+            if(Test-Path -Path $XML_PortList_BackupPath -PathType Leaf)
             {
                 Remove-Item -Path $XML_PortList_BackupPath
             }
@@ -102,12 +112,12 @@ Begin{
             Write-Verbose -Message "Cleanup downloaded file and restore backup..."
 
             # On error: cleanup downloaded file and restore backup
-            if([System.IO.File]::Exists($XML_PortList_Path))
+            if(Test-Path -Path $XML_PortList_Path -PathType Leaf)
             {
                 Remove-Item -Path $XML_PortList_Path -Force
             }
 
-            if([System.IO.File]::Exists($XML_PortList_BackupPath))
+            if(Test-Path -Path $XML_PortList_BackupPath -PathType Leaf)
             {
                 Rename-Item -Path $XML_PortList_BackupPath -NewName $XML_PortList_Path
             }
@@ -157,17 +167,19 @@ Begin{
 }
 
 Process{
+    $Xml_PortList_Available = Test-Path -Path $XML_PortList_Path -PathType Leaf
+
     if($UpdateList)
     {
         UpdateListFromIANA
     }
-    elseif(-Not([System.IO.File]::Exists($XML_PortList_Path)))
+    elseif($Xml_PortList_Available -eq $false)
     {
         Write-Warning -Message "No xml-file to assign service with port found! Use the parameter ""-UpdateList"" to download the latest version from IANA.org. This warning doesn`t affect the scanning procedure."
     }
 
     # Check if it is possible to assign service with port --> import xml-file
-    if([System.IO.File]::Exists($XML_PortList_Path))
+    if($Xml_PortList_Available)
     {
         $AssignServiceWithPort = $true
 
@@ -176,12 +188,6 @@ Process{
     else 
     {
         $AssignServiceWithPort = $false    
-    }
-
-    # Validate Port-Range
-    if($StartPort -gt $EndPort)
-    {
-        throw "Invalid Port-Range... Check your input!"
     }
 
     # Check if host is reachable
