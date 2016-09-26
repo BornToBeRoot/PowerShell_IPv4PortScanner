@@ -80,8 +80,8 @@ Begin{
     $IANA_PortList_WebUri = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml"
 
     # Port list path
-    $XML_PortList_Path = "$PSScriptRoot\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml"
-    $XML_PortList_BackupPath = "$PSScriptRoot\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml.bak"
+    $XML_PortList_Path = "$PSScriptRoot\Resources\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml"
+    $XML_PortList_BackupPath = "$PSScriptRoot\Resources\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml.bak"
 
     # Function to update the list from IANA (Port list)
     function UpdateListFromIANA
