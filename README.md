@@ -14,7 +14,7 @@ To reach the best possible performance, this script uses a [RunspacePool](https:
 
 ![Screenshot](Documentation/Images/IPv4PortScan_CPUusage.png?raw=true "CPU usage")
 
-If you are looking for a module containing this script... you can find it [here](https://github.com/BornToBeRoot/PowerShell)!
+If you are looking for a module containing this script as function... you can find it [here](https://github.com/BornToBeRoot/PowerShell)!
 
 Maybe you're also interested in my asynchronus [IPv4 Network Scanner](https://github.com/BornToBeRoot/PowerShell_IPv4NetworkScanner).
 
