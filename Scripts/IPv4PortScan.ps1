@@ -65,129 +65,45 @@ param(
     [Parameter(
         Position=4,
         HelpMessage='Execute script without user interaction')]
-    [switch]$Force,
-
-    [Parameter(
-        Position=5,
-        HelpMessage='Update Service Name and Transport Protocol Port Number Registry from IANA.org')]
-    [switch]$UpdateList
+    [switch]$Force
 )
 
 Begin{
     Write-Verbose -Message "Script started at $(Get-Date)"
 
-    # IANA --> Service Name and Transport Protocol Port Number Registry -> xml-file
-    $IANA_PortList_WebUri = "https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xml"
-
-    # Port list path
-    $XML_PortList_Path = "$PSScriptRoot\Resources\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml"
-    $XML_PortList_BackupPath = "$PSScriptRoot\Resources\IANA_ServiceName_and_TransportProtocolPortNumber_Registry.xml.bak"
-
-    # Function to update the list from IANA (Port list)
-    function UpdateListFromIANA
-    {
-        try{
-            Write-Verbose -Message "Create backup of the IANA Service Name and Transport Protocol Port Number Registry..."
-
-            # Backup file, before download a new version
-            if(Test-Path -Path $XML_PortList_Path -PathType Leaf)
-            {
-                Rename-Item -Path $XML_PortList_Path -NewName $XML_PortList_BackupPath
-            }
-
-            Write-Verbose -Message "Updating Service Name and Transport Protocol Port Number Registry from IANA.org..."
-
-            # Download xml-file from IANA and save it
-            [xml]$New_XML_PortList = Invoke-WebRequest -Uri $IANA_PortList_WebUri -ErrorAction Stop
-
-            $New_XML_PortList.Save($XML_PortList_Path)
-
-            # Remove backup, if no error
-            if(Test-Path -Path $XML_PortList_BackupPath -PathType Leaf)
-            {
-                Remove-Item -Path $XML_PortList_BackupPath
-            }
-        }
-        catch{
-            Write-Verbose -Message "Cleanup downloaded file and restore backup..."
-
-            # On error: cleanup downloaded file and restore backup
-            if(Test-Path -Path $XML_PortList_Path -PathType Leaf)
-            {
-                Remove-Item -Path $XML_PortList_Path -Force
-            }
-
-            if(Test-Path -Path $XML_PortList_BackupPath -PathType Leaf)
-            {
-                Rename-Item -Path $XML_PortList_BackupPath -NewName $XML_PortList_Path
-            }
-
-            $_.Exception.Message  
-        }
-    } 
-
-    # Function to assign service with port
-    function AssignServiceWithPort
-    {
-        param(
-            $Result
-        )
-
-        Begin{
-
-        }
-
-        Process{
-            $Service = [String]::Empty
-            $Description = [String]::Empty
-                        
-            foreach($XML_Node in $XML_PortList.Registry.Record)
-            {                
-                if(($Result.Protocol -eq $XML_Node.protocol) -and ($Result.Port -eq $XML_Node.number))
-                {
-                    $Service = $XML_Node.name
-                    $Description = $XML_Node.description
-                    break
-                }
-            }
-                
-            [pscustomobject] @{
-                Port = $Result.Port
-                Protocol = $Result.Protocol
-                ServiceName = $Service
-                ServiceDescription = $Description
-                Status = $Result.Status
-            }
-        }  
-
-        End{
-
-        }
-    }
+    $PortList_Path = "$PSScriptRoot\Resources\ports.txt"
 }
 
 Process{
-    $Xml_PortList_Available = Test-Path -Path $XML_PortList_Path -PathType Leaf
+    if(Test-Path -Path $PortList_Path -PathType Leaf)
+    {        
+        $PortsHashTable = @{ }
 
-    if($UpdateList)
-    {
-        UpdateListFromIANA
-    }
-    elseif($Xml_PortList_Available -eq $false)
-    {
-        Write-Warning -Message "No xml-file to assign service with port found! Use the parameter ""-UpdateList"" to download the latest version from IANA.org. This warning doesn`t affect the scanning procedure."
-    }
+        Write-Verbose -Message "Read ports.txt and fill hash table..."
 
-    # Check if it is possible to assign service with port --> import xml-file
-    if($Xml_PortList_Available)
-    {
+        foreach($Line in Get-Content -Path $PortList_Path)
+        {
+            if(-not([String]::IsNullOrEmpty($Line)))
+            {
+                try{
+                    $HashTableData = $Line.Split('|')
+                    
+                    if($HashTableData[1] -eq "tcp")
+                    {
+                        $PortsHashTable.Add([int]$HashTableData[0], [String]::Format("{0}|{1}",$HashTableData[2],$HashTableData[3]))
+                    }
+                }
+                catch [System.ArgumentException] { } # Catch if port is already added to hash table
+            }
+        }
+
         $AssignServiceWithPort = $true
-
-        $XML_PortList = [xml](Get-Content -Path $XML_PortList_Path)
     }
     else 
     {
         $AssignServiceWithPort = $false    
+
+        Write-Warning -Message "No port-file to assign service with port found! Execute the script ""Create-PortListFromWeb.ps1"" to download the latest version.. This warning doesn`t affect the scanning procedure."
     }
 
     # Check if host is reachable
@@ -373,7 +289,17 @@ Process{
             {        
                 if($AssignServiceWithPort)
                 {
-                    AssignServiceWithPort -Result $Job_Result
+                    $Service = [String]::Empty
+
+                    $Service = $PortsHashTable.Get_Item($Job_Result.Port).Split('|')
+                
+                    [pscustomobject] @{
+                        Port = $Job_Result.Port
+                        Protocol = $Job_Result.Protocol
+                        ServiceName = $Service[0]
+                        ServiceDescription = $Service[1]
+                        Status = $Job_Result.Status
+                    }
                 }   
                 else 
                 {

@@ -21,7 +21,7 @@ Maybe you're also interested in my asynchronus [IPv4 Network Scanner](https://gi
 ## Syntax
 
 ```powershell
-.\IPv4PortScan.ps1 [-ComputerName] <String> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-Force]] [[-UpdateList]] [<CommonParameters>]
+.\IPv4PortScan.ps1 [-ComputerName] <String> [[-StartPort] <Int32>] [[-EndPort] <Int32>] [[-Threads] <Int32>] [[-Force]] [<CommonParameters>]
 ```
 
 ## Example
