@@ -1,12 +1,12 @@
-# PowerShell - IPv4 Port Scanner
+# PowerShell script | IPv4 port scanner
 
-Powerful asynchronus IPv4 Port Scanner for PowerShell.
+Powerful asynchronus IPv4 port scanner for PowerShell.
 
 ## Description
 
-This powerful asynchronus IPv4 Port Scanner allows you to scan every Port-Range you want (500 to 2600 would work). Only TCP-Ports are scanned.
+This powerful asynchronus IPv4 port scanner allows you to scan every port range you want (500 to 2600 would work). Only TCP ports are scanned.
 
-The result will contain the Port number, Protocol, Service name, Description and the Status.
+The result will contain the port number, protocol, service name, description and the status.
 
 ![Screenshot](Documentation/Images/IPv4PortScan.png?raw=true "IPv4PortScan")
 
