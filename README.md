@@ -1,4 +1,4 @@
-# PowerShell script | IPv4 port scanner
+# PowerShell | IPv4 port scanner
 
 Powerful asynchronus IPv4 port scanner for PowerShell.
 
